@@ -14,7 +14,13 @@ func (t *AVLTree) Insert(key int) {
 	fmt.Printf("\nnew root is [%s]\n", t.Root)
 }
 
-func (t *AVLTree) Remove(key int) {}
+func (t *AVLTree) Remove(key int) {
+	if t.Root == nil {
+		return
+	}
+
+	t.Root = removeNode(t.Root, key)
+}
 
 func balance(n *Node) *Node {
 	fmt.Printf("\nbalancing node %d\n", n.Key)
@@ -56,6 +62,12 @@ func balanceFactor(n *Node) int {
 	return getNodeHeight(n.Right) - getNodeHeight(n.Left)
 }
 
+func getNodeHeight(n *Node) int {
+	if n == nil { return 0 }
+
+	return n.Height
+}
+
 func rotLeft(root *Node) *Node {
 	newRoot := root.Right
   	root.Right = newRoot.Left
@@ -78,8 +90,3 @@ func rotRight(root *Node) *Node {
   	return newRoot 
 }
 
-func getNodeHeight(n *Node) int {
-	if n == nil { return 0 }
-
-	return n.Height
-}
