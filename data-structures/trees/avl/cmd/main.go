@@ -1,4 +1,4 @@
-package main 
+package main
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ func main() {
 	t.Insert(7)
 	t.Insert(6)
 	t.Insert(5)
-	
+
 	t.Remove(6)
 
 	infixTraverse(t.Root)

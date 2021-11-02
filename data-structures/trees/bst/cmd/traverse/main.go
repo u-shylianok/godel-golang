@@ -1,4 +1,4 @@
-package main 
+package main
 
 import (
 	"fmt"
@@ -6,8 +6,8 @@ import (
 	"github.com/apaliavy/godel-golang/data-structures/trees/bst/model"
 )
 
-func main () {
-	var t model.Tree 
+func main() {
+	var t model.Tree
 
 	t.Insert(10)
 	t.Insert(1)
@@ -34,7 +34,7 @@ func printPreOrder(n *model.Node) {
 	if n == nil {
 		return
 	}
-	
+
 	fmt.Printf("%d ", n.Key)
 	printPreOrder(n.Left)
 	printPreOrder(n.Right)

@@ -1,4 +1,4 @@
-package main 
+package main
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	var t model.Tree 
+	var t model.Tree
 
 	t.Insert(10)
 	t.Insert(1)
@@ -17,5 +17,5 @@ func main() {
 	t.Insert(10)
 	t.Insert(3)
 
-	fmt.Printf("%+v", t)	
+	fmt.Printf("%+v", t)
 }

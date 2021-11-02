@@ -13,9 +13,9 @@ func (t *Tree) Insert(data int) {
 }
 
 type Node struct {
-	Key int 
-	Left *Node 
-	Right *Node 
+	Key   int
+	Left  *Node
+	Right *Node
 }
 
 func (n *Node) Insert(data int) {
@@ -34,4 +34,4 @@ func (n *Node) Insert(data int) {
 	} else {
 		n.Right.Insert(data)
 	}
-} 
+}

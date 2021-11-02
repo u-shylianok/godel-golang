@@ -1,17 +1,17 @@
-package model 
+package model
 
 import "fmt"
 
 type Node struct {
-	Key int 
+	Key    int
 	Height int
-	Left *Node 
-	Right *Node 
+	Left   *Node
+	Right  *Node
 }
 
 func NewNode(key int) *Node {
 	return &Node{
-		Key: key,
+		Key:    key,
 		Height: 1,
 	}
 }
@@ -50,7 +50,7 @@ func insertNode(n *Node, key int) *Node {
 		n.Right = insertNode(n.Right, key)
 	}
 
-	n.Height = 1 + getNodeHeight(n.Left) + getNodeHeight(n.Right);
+	n.Height = 1 + getNodeHeight(n.Left) + getNodeHeight(n.Right)
 
 	return balance(n)
 }
@@ -59,7 +59,7 @@ func removeNode(n *Node, key int) *Node {
 	if key < n.Key {
 		n.Left = removeNode(n.Left, key)
 		return balance(n)
-	} 
+	}
 
 	if key > n.Key {
 		n.Right = removeNode(n.Right, key)
@@ -74,7 +74,7 @@ func removeNode(n *Node, key int) *Node {
 	min := findMin(r)
 	min.Right = removeMin(r)
 	min.Left = q
-	
+
 	return balance(min)
 }
 
@@ -84,7 +84,7 @@ func findMin(n *Node) *Node {
 	}
 
 	return n
-} 
+}
 
 func removeMin(root *Node) *Node {
 	if root.Left == nil {

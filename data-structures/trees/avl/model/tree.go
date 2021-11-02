@@ -1,4 +1,4 @@
-package model 
+package model
 
 import "fmt"
 
@@ -31,7 +31,7 @@ func balance(n *Node) *Node {
 
 	fmt.Printf("\nbalance factor for node [%s] is %d\n", n, nbf)
 
-	// left rotation 
+	// left rotation
 	if nbf == 2 {
 		if balanceFactor(n.Right) < 0 { // big left rotation
 			fmt.Printf("\n[!] doing big left rotation\n")
@@ -41,9 +41,9 @@ func balance(n *Node) *Node {
 		}
 		return rotLeft(n)
 	}
-    
+
 	if nbf == -2 {
-		// right rotation 
+		// right rotation
 		if balanceFactor(n.Left) > 0 { // big right rotation
 			fmt.Printf("\n[!] doing big right rotation\n")
 			n.Left = rotLeft(n.Left)
@@ -57,36 +57,39 @@ func balance(n *Node) *Node {
 }
 
 func balanceFactor(n *Node) int {
-	if n == nil { return 0 }
+	if n == nil {
+		return 0
+	}
 
 	return getNodeHeight(n.Right) - getNodeHeight(n.Left)
 }
 
 func getNodeHeight(n *Node) int {
-	if n == nil { return 0 }
+	if n == nil {
+		return 0
+	}
 
 	return n.Height
 }
 
 func rotLeft(root *Node) *Node {
 	newRoot := root.Right
-  	root.Right = newRoot.Left
-  	newRoot.Left = root
+	root.Right = newRoot.Left
+	newRoot.Left = root
 
 	root.fixHeight()
 	newRoot.fixHeight()
 
-  	return newRoot 
-} 
+	return newRoot
+}
 
 func rotRight(root *Node) *Node {
 	newRoot := root.Left
-  	root.Left = newRoot.Right
-  	newRoot.Right = root
+	root.Left = newRoot.Right
+	newRoot.Right = root
 
 	root.fixHeight()
 	newRoot.fixHeight()
 
-  	return newRoot 
+	return newRoot
 }
-
