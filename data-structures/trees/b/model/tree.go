@@ -7,7 +7,6 @@ func BTreeSearch(x, k) {
 	while i <= x.n && k > x.key[i] {
 		i = i + 1
 	}
-
 	
 	if i <= x.n && k == x.key[i] {
 		// check do we have key in current node
@@ -34,6 +33,7 @@ func BTreeCreate(T) {
 
 // x - незаполненный внутренний узел 
 // x.c[i] - заполненный дочерний узел х
+// BTreeSplitChild - вырезать и вставить 
 func BTreeSplitChild(x, i) {
 	z := AllocateNode()
 	y := x.c[i]
@@ -70,3 +70,51 @@ func BTreeSplitChild(x, i) {
 	DISK_WRITE(z)
 	DISK_WRITE(x)
 } 
+
+func BTreeInsert(T, k) {
+	r := T.Root
+	if r.n != 2*t - 1 {
+		return BTreeInsertNonFull(r, k)
+	}
+
+	s := AllocateNode()
+	T.root = s 
+	s.leaf = false
+	s.n = 0
+	s.c[1] = r 
+
+	BTreeSplitChild(s, 1)
+
+	return BTreeInsertNonFull(s, k)
+}
+
+func BTreeInsertNonFull(x, k) {
+	i := x.n 
+
+	if x.leaf {
+		while i >= 1 && k < x.key[i] {
+			x.key[i+1] = x.key[i]
+			i = i -1 
+		}
+		x.key[i+1] = k
+		x.n = x.n + 1
+		DISK_WRITE(x)
+		return 
+	}
+
+	while i >= 1 && k < x.key[i] {
+		i = i - 1 
+	}
+
+	i = i + 1 
+	DISK_READ(x.c[i])
+
+	if x.c[i].n == 2*t - 1 {
+		BTreeSplitChild(x, i)
+		if k > x.key[i] {
+			i = i + 1 
+		}
+	}
+
+	return BTreeInsertNonFull(x.c[i], k)
+}
