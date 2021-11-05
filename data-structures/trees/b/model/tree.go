@@ -1,120 +1,142 @@
-package model 
+package model
 
-func BTreeSearch(x, k) {
+type Btree struct {
+	Root *Node
+
+	degree int
+}
+
+type Node struct {
+	leaf   bool
+	keys   []int
+	childs []*Node
+}
+
+func (n *Node) Len() int {
+	return len(n.keys)
+}
+
+func BTreeSearch(x *Node, k int) (n *Node, idx int) {
 	i := 1
 
-	// linear search of minimal index i 
-	while i <= x.n && k > x.key[i] {
+	// linear search of minimal index i
+	for i <= x.Len() && k > x.keys[i] {
 		i = i + 1
 	}
-	
-	if i <= x.n && k == x.key[i] {
+
+	if i <= x.Len() && k == x.keys[i] {
 		// check do we have key in current node
-		return (x, i)
+		return x, i
 	} else if x.leaf {
 		// if it's a leaf - failed to find
-		return NIL 
+		return nil, 0
 	} else {
 		// load more data from disk
-		DISK_READ(x.c[i])
+		// DISK_READ(x.childs[i])
 	}
 
 	// recursively search in the sub tree
-	return BTreeSearch(x.c[i], k)
+	return BTreeSearch(x.childs[i], k)
 }
 
-func BTreeCreate(T) {
-	x = AllocateNode() 
-	x.leaf = true 
-	x.n = 0 
-	DISK_WRITE(x)
-	T.root = x
+func AllocateNode(degree int) *Node {
+	return &Node{
+		keys:   make([]int, 2*degree-1),
+		childs: make([]*Node, 2*degree),
+	}
 }
 
-// x - незаполненный внутренний узел 
+func BTreeCreate(degree int) *Btree {
+	x := AllocateNode(degree)
+	x.leaf = true
+	//DISK_WRITE(x)
+
+	return &Btree{Root: x, degree: degree}
+}
+
+// x - незаполненный внутренний узел
 // x.c[i] - заполненный дочерний узел х
-// BTreeSplitChild - вырезать и вставить 
-func BTreeSplitChild(x, i) {
-	z := AllocateNode()
-	y := x.c[i]
+// splitChild - вырезать и вставить
+func (t *Btree) splitChild(x *Node, i int) {
+	y := x.childs[i]
 
+	z := AllocateNode(t.degree) // todo: AllocateNode(t-1)
 	z.leaf = y.leaf
-	z.n = t - 1 
+	//z.n = t - 1
 
-	for j = 1 to t-1 {
-		x.key[j] = y.key[j+t]
+	for j := 1; j < t.degree-1; j++ {
+		x.keys[j] = y.keys[j+t.degree]
 	}
 
 	if !y.leaf {
-		for j = 1 to t {
-			z.c[j] = y.c[j+t]
+		for j := 1; j < t.degree; j++ {
+			z.childs[j] = y.childs[j+t.degree]
 		}
 	}
 
-	y.n = t -1 
-
-	for j := x.n+1 downto i+1 {
-		x.c[j+1] = x.c[j]
+	// y.n = t -1
+	for j := x.Len() + 1; j > i+1; j-- {
+		x.childs[j+1] = x.childs[j]
 	}
 
-	x.c[i+1] = z
+	x.childs[i+1] = z
 
-	for j := x.n downto i {
-		x.key[j+1] = x.key[j]
+	for j := x.Len(); j > i; j-- {
+		x.keys[j+1] = x.keys[j]
 	}
 
-	x.key[i] = y.key[t]
-	x.n = x.n + 1
+	x.keys[i] = y.keys[t.degree]
 
-	DISK_WRITE(y)
-	DISK_WRITE(z)
-	DISK_WRITE(x)
-} 
-
-func BTreeInsert(T, k) {
-	r := T.Root
-	if r.n != 2*t - 1 {
-		return BTreeInsertNonFull(r, k)
-	}
-
-	s := AllocateNode()
-	T.root = s 
-	s.leaf = false
-	s.n = 0
-	s.c[1] = r 
-
-	BTreeSplitChild(s, 1)
-
-	return BTreeInsertNonFull(s, k)
+	//x.n = x.n + 1
+	//DISK_WRITE(y)
+	//DISK_WRITE(z)
+	//DISK_WRITE(x)
 }
 
-func BTreeInsertNonFull(x, k) {
-	i := x.n 
+func (t *Btree) Insert(k int) {
+	r := t.Root
+	if r.Len() != 2*t.degree-1 {
+		t.insertNonFull(r, k)
+		return
+	}
+
+	s := AllocateNode(t.degree)
+	t.Root = s
+	s.leaf = false
+	s.childs[1] = r
+
+	t.splitChild(s, 1)
+
+	t.insertNonFull(s, k)
+}
+
+func (t *Btree) insertNonFull(x *Node, k int) {
+	i := x.Len()
 
 	if x.leaf {
-		while i >= 1 && k < x.key[i] {
-			x.key[i+1] = x.key[i]
-			i = i -1 
+		for i >= 1 && k < x.keys[i] {
+			x.keys[i+1] = x.keys[i]
+			i = i - 1
 		}
-		x.key[i+1] = k
-		x.n = x.n + 1
-		DISK_WRITE(x)
-		return 
+
+		x.keys[i+1] = k
+		//DISK_WRITE(x)
+		return
 	}
 
-	while i >= 1 && k < x.key[i] {
-		i = i - 1 
+	for i >= 1 && k < x.keys[i] {
+		i = i - 1
 	}
 
-	i = i + 1 
-	DISK_READ(x.c[i])
+	i = i + 1
+	//DISK_READ(x.c[i])
 
-	if x.c[i].n == 2*t - 1 {
-		BTreeSplitChild(x, i)
-		if k > x.key[i] {
-			i = i + 1 
+	if x.childs[i].Len() == 2*t.degree-1 {
+		t.splitChild(x, i)
+		if k > x.keys[i] {
+			i = i + 1
 		}
 	}
 
-	return BTreeInsertNonFull(x.c[i], k)
+	t.insertNonFull(x.childs[i], k)
 }
